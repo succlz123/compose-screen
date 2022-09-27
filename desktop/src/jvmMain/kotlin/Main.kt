@@ -1,12 +1,8 @@
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import org.succlz123.app.screen.ui.main.DemoMainContent
 import org.succlz123.lib.screen.ScreenContainer
 
 fun main() = application {
@@ -20,8 +16,6 @@ fun main() = application {
             exitApplication()
         },
     ) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Please switch to the /feat/app-demo branch")
-        }
+        DemoMainContent()
     }
 }
