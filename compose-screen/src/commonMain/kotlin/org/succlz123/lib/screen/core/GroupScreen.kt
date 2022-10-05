@@ -1,9 +1,9 @@
 package org.succlz123.lib.screen.core
 
 import androidx.compose.runtime.Composable
-import org.succlz123.lib.screen.ScreenPopTransition
-import org.succlz123.lib.screen.ScreenPushTransition
 import org.succlz123.lib.screen.ScreenRecord
+import org.succlz123.lib.screen.transition.ScreenPopTransition
+import org.succlz123.lib.screen.transition.ScreenPushTransition
 
 class GroupScreen(
     name: String,

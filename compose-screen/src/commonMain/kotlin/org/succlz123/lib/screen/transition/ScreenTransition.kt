@@ -1,9 +1,11 @@
 @file:OptIn(ExperimentalAnimationApi::class)
 
-package org.succlz123.lib.screen
+package org.succlz123.lib.screen.transition
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import org.succlz123.lib.screen.ScreenLogger
+import org.succlz123.lib.screen.ScreenRecord
 
 typealias ScreenEnterTransitionProvider = (AnimatedContentScope<ScreenRecord>) -> EnterTransition
 

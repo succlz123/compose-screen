@@ -20,9 +20,9 @@
 
 ```
 // Android
-implementation("io.github.succlz123:compose-screen-android:0.0.1")
+implementation("io.github.succlz123:compose-screen-android:0.0.2")
 // Desktop
-implementation("io.github.succlz123:compose-screen-desktop:0.0.1")
+implementation("io.github.succlz123:compose-screen-desktop:0.0.2")
 ```
 
 ## 开始
@@ -34,7 +34,12 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ScreenContainer(this, this, this) {
+            // 生命周期，按键返回等都由 activity 接管
+            ScreenContainer(this) {
+                // Screen Host
+            }
+            // 或者分别设置相应所有者
+            ScreenContainer(this, this, this, this) {
                 // Screen Host
             }
         }
@@ -229,7 +234,7 @@ Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
 
 宿主 Android/Desktop 生命周期回调
 
-> Android 是收不到 onCreate onDestroy 相应回调
+> Android 下目前 Compose 收不到 onCreate onDestroy 相应回调
 
 | Compose Screen - Host Lifecyle | Android   | Desktop                |
 |--------------------------------|-----------|------------------------|
@@ -334,6 +339,30 @@ screenNavigator.push(
 
 可以通过 enableEscBack 来开启关闭 Compose Screen 响应 ESC 按键返回
 
+#### 横竖屏 UI 适配
+
+```kotlin
+val windowSizeOwner = LocalScreenWindowSizeOwner.current
+val windowWidth = remember {
+    windowSizeOwner.getWindowHolder().size.value.width.toInt()
+}
+val windowHeight = remember {
+    windowSizeOwner.getWindowHolder().size.value.height.toInt()
+}
+val windowSizeClass = remember {
+    windowSizeOwner.getWindowHolder().sizeClass.value
+}
+// 具体参考 https://developer.android.com/jetpack/compose/layouts/adaptive
+when (windowSizeClass) {
+    ScreenWindowSizeClass.Compact -> {}
+    ScreenWindowSizeClass.Medium -> {}
+    ScreenWindowSizeClass.Expanded -> {}
+}
+```
+
+#### Android 异常状态恢复
+
+目前已自动处理了 Android 横竖屏切换或者配置变化下导致的异常状态恢复
 
 # 感谢
 

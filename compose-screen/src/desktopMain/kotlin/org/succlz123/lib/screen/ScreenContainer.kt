@@ -1,9 +1,6 @@
 package org.succlz123.lib.screen
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.painter.Painter
@@ -17,7 +14,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import org.succlz123.lib.screen.back.rememberOnBackPressedDispatcherOwner
 import org.succlz123.lib.screen.lifecycle.ScreenLifecycle
 import org.succlz123.lib.screen.lifecycle.rememberScreenLifecycleOwner
+import org.succlz123.lib.screen.viewmodel.ScreenDefaultEmptySavableViewModel
 import org.succlz123.lib.screen.viewmodel.rememberScreenViewModelStoreOwner
+import org.succlz123.lib.screen.window.getWindowSizeClass
 import org.succlz123.lib.screen.window.rememberScreenWindowSizeOwner
 import java.awt.Dimension
 
@@ -42,7 +41,8 @@ fun ScreenContainer(
     content: @Composable FrameWindowScope.() -> Unit,
 ) {
     val screenLifecycleOwner = rememberScreenLifecycleOwner()
-    val screenViewModelStoreOwner = rememberScreenViewModelStoreOwner()
+    val savableViewModel = remember { ScreenDefaultEmptySavableViewModel() }
+    val screenViewModelStoreOwner = rememberScreenViewModelStoreOwner(null)
     val screenOnBackPressedDispatcherOwner = rememberOnBackPressedDispatcherOwner()
     val screenWindowSizeOwner = rememberScreenWindowSizeOwner()
 
@@ -61,14 +61,16 @@ fun ScreenContainer(
     val density = LocalDensity.current
     LaunchedEffect(Unit) {
         snapshotFlow { state.size }.distinctUntilChanged().collect {
-            screenWindowSizeOwner.getWindowHolder().size =
+            screenWindowSizeOwner.getWindowHolder().size.value =
                 Size(it.width.value * density.density, it.height.value * density.density)
+            screenWindowSizeOwner.getWindowHolder().sizeClass.value = getWindowSizeClass(it.width)
         }
     }
 
     CompositionLocalProvider(
         LocalScreenScreenLifecycleOwner provides screenLifecycleOwner,
         LocalScreenViewModelStoreOwner provides screenViewModelStoreOwner,
+        LocalScreenSavableViewModel provides savableViewModel,
         LocalScreenOnBackPressedDispatcherOwner provides screenOnBackPressedDispatcherOwner,
         LocalScreenWindowSizeOwner provides screenWindowSizeOwner,
     ) {

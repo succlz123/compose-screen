@@ -7,14 +7,21 @@ import org.succlz123.lib.screen.operation.ScreenStackState
 import kotlin.reflect.KClass
 
 @Composable
-fun rememberScreenViewModelStoreOwner(): ScreenViewModelStoreOwner {
+fun rememberScreenViewModelStoreOwner(savableViewModel: ScreenSavableViewModel?): ScreenViewModelStoreOwner {
     return remember {
-        object : ScreenViewModelStoreOwner {
-            var screenViewModelStore = ScreenViewModelStore()
+        val previousOwner = savableViewModel?.getGlobalViewModelOwner()
+        if (previousOwner != null) {
+            previousOwner
+        } else {
+            val newOwner = object : ScreenViewModelStoreOwner {
+                var screenViewModelStore = ScreenViewModelStore()
 
-            override fun getViewModelStore(): ScreenViewModelStore {
-                return screenViewModelStore
+                override fun getViewModelStore(): ScreenViewModelStore {
+                    return screenViewModelStore
+                }
             }
+            savableViewModel?.bind(newOwner)
+            newOwner
         }
     }
 }

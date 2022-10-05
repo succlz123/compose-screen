@@ -55,13 +55,25 @@ fun ScreenPopupWindowPopupScreen() {
         return
     }
     val windowSizeOwner = LocalScreenWindowSizeOwner.current
-    val windowWidth = windowSizeOwner.getWindowHolder().size.width.toInt()
-    val windowHeight = windowSizeOwner.getWindowHolder().size.height.toInt()
+    val windowWidth = remember {
+        windowSizeOwner.getWindowHolder().size.value.width.toInt()
+    }
+    val windowHeight = remember {
+        windowSizeOwner.getWindowHolder().size.value.height.toInt()
+    }
 
-    val viewSize = screenRecord.arguments.value(KEY_POPUP_WINDOW_VIEW_SIZE, IntSize.Zero)
-    val globalOffset = screenRecord.arguments.value(KEY_POPUP_WINDOW_VIEW_GLOBAL_OFFSET, Offset.Zero)
-    val clickOffset = screenRecord.arguments.value(KEY_POPUP_WINDOW_VIEW_CLICK_OFFSET, Offset.Zero)
-    val clickGlobalOffset = Offset(globalOffset.x + clickOffset.x, globalOffset.y + clickOffset.y)
+    val viewSize = remember {
+        screenRecord.arguments.value(KEY_POPUP_WINDOW_VIEW_SIZE, IntSize.Zero)
+    }
+    val globalOffset = remember {
+        screenRecord.arguments.value(KEY_POPUP_WINDOW_VIEW_GLOBAL_OFFSET, Offset.Zero)
+    }
+    val clickOffset = remember {
+        screenRecord.arguments.value(KEY_POPUP_WINDOW_VIEW_CLICK_OFFSET, Offset.Zero)
+    }
+    val clickGlobalOffset = remember {
+        Offset(globalOffset.x + clickOffset.x, globalOffset.y + clickOffset.y)
+    }
 
     ScreenLogger.debugLog(
         "Window Size: windowWidth=$windowWidth windowHeight=$windowHeight"

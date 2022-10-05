@@ -14,11 +14,16 @@ import org.succlz123.lib.screen.lifecycle.ScreenLifecycleObserver
 import org.succlz123.lib.screen.lifecycle.ScreenLifecycleOwner
 import org.succlz123.lib.screen.operation.PushOptions
 import org.succlz123.lib.screen.operation.ScreenStackState
+import org.succlz123.lib.screen.viewmodel.ScreenSavableViewModel
 import org.succlz123.lib.screen.viewmodel.ScreenViewModelStoreOwner
 import org.succlz123.lib.screen.window.ScreenWindowSizeOwner
 
 val LocalScreenScreenLifecycleOwner = compositionLocalOf<ScreenLifecycleOwner> {
     error("${ScreenLogger.TAG}: There is no ScreenLifecycleOwner in the local!")
+}
+
+val LocalScreenSavableViewModel = compositionLocalOf<ScreenSavableViewModel> {
+    error("${ScreenLogger.TAG}: There is no ScreenSavableViewModel in the local!")
 }
 
 val LocalScreenViewModelStoreOwner = compositionLocalOf<ScreenViewModelStoreOwner> {
@@ -53,6 +58,7 @@ fun ScreenHost(
         LocalScreenNavigator provides screenNavigator
     ) {
         val lifecycleOwner = LocalScreenScreenLifecycleOwner.current
+        val savableViewModel = LocalScreenSavableViewModel.current
         val viewModelStoreOwner = LocalScreenViewModelStoreOwner.current
         val onBackPressedDispatcher = LocalScreenOnBackPressedDispatcherOwner.current
 
@@ -66,10 +72,13 @@ fun ScreenHost(
         }
 
         val manager = remember {
-            ScreenManager(
-                screenCollector, lifecycleOwner.getLifecycle(), onBackPressedDispatcher.getOnBackPressedDispatcher()
-            ).apply {
+            val sm = savableViewModel.getScreenManager() ?: ScreenManager()
+            sm.apply {
+                this.init(
+                    screenCollector, lifecycleOwner.getLifecycle(), onBackPressedDispatcher.getOnBackPressedDispatcher()
+                )
                 screenNavigator.init(this)
+                savableViewModel.bind(this)
             }
         }
 
@@ -78,7 +87,9 @@ fun ScreenHost(
             lifecycleOwner.getLifecycle().addObserver(manager)
             onDispose {
                 lifecycleOwner.getLifecycle().removeAllObserver()
-                manager.clearAllVM()
+                if (savableViewModel == null) {
+                    manager.clearAllVM()
+                }
                 ScreenLogger.debugLog("screen host: ON_DISPOSE")
             }
         }

@@ -1,9 +1,9 @@
 package org.succlz123.lib.screen.operation
 
-import org.succlz123.lib.screen.ScreenPopTransition
-import org.succlz123.lib.screen.ScreenPushTransition
-import org.succlz123.lib.screen.ScreenTransitionPopNone
-import org.succlz123.lib.screen.ScreenTransitionPushNone
+import org.succlz123.lib.screen.transition.ScreenPopTransition
+import org.succlz123.lib.screen.transition.ScreenPushTransition
+import org.succlz123.lib.screen.transition.ScreenTransitionPopNone
+import org.succlz123.lib.screen.transition.ScreenTransitionPushNone
 import org.succlz123.lib.screen.core.Screen
 
 class PushOptions(

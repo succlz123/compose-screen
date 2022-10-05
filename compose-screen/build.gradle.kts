@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import java.util.*
 
 plugins {
@@ -40,6 +39,9 @@ kotlin {
             dependencies {
                 api("androidx.appcompat:appcompat:1.5.1")
                 api("androidx.core:core-ktx:1.9.0")
+                api("androidx.window:window:1.1.0-alpha03")
+
+                implementation("androidx.compose.foundation:foundation:1.2.1")
             }
         }
         val androidTest by getting {
@@ -59,8 +61,8 @@ android {
     compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = 24
-        targetSdk = 31
+        minSdk = 21
+        targetSdk = 30
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

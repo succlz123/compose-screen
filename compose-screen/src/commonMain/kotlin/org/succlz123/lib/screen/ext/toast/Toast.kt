@@ -7,13 +7,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.succlz123.lib.screen.*
-import org.succlz123.lib.screen.core.ItemScreen
+import org.succlz123.lib.screen.LocalScreenRecord
+import org.succlz123.lib.screen.value
 
 internal const val ScreenToastPopupScreen = "~~~Screen-Toast-PopupScreen~~~"
 internal const val ScreenToastSaveId = -116222633
@@ -35,23 +36,18 @@ val ARGS_TOAST_TIME_LOCATION_BOTTOM_START = Alignment.BottomStart
 val ARGS_TOAST_TIME_LOCATION_BOTTOM_CENTER = Alignment.BottomCenter
 val ARGS_TOAST_TIME_LOCATION_BOTTOM_END = Alignment.BottomEnd
 
-class ScreenAnonymityToastFragmentScreen(
-    name: String = "ScreenAnonymityToastPopupScreen",
-    replaceable: Boolean = false,
-    overlayIndex: Int = 0,
-    pushTransition: ScreenPushTransition = ScreenTransitionPushNone(),
-    popTransition: ScreenPopTransition = ScreenTransitionPopNone(),
-    content: @Composable (ScreenRecord) -> Unit
-) : ItemScreen(name, replaceable, overlayIndex, pushTransition, popTransition, content)
-
 @Composable
 fun ScreenToastPopupScreen() {
     val screenRecord = LocalScreenRecord.current
-    val msg = screenRecord.arguments.value(KEY_TOAST_MSG, "")
+    val msg = remember {
+        screenRecord.arguments.value(KEY_TOAST_MSG, "")
+    }
     if (msg.isEmpty()) {
         return
     }
-    val location = screenRecord.arguments.value(KEY_TOAST_TIME_LOCATION, ARGS_TOAST_TIME_LOCATION_BOTTOM_CENTER)
+    val location = remember {
+        screenRecord.arguments.value(KEY_TOAST_TIME_LOCATION, ARGS_TOAST_TIME_LOCATION_BOTTOM_CENTER)
+    }
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         Card(
             modifier = Modifier.align(location).padding(64.dp, 92.dp),
@@ -59,9 +55,7 @@ fun ScreenToastPopupScreen() {
             elevation = 3.dp,
             backgroundColor = Color(0xCC000000)
         ) {
-            Text(
-                modifier = Modifier.padding(24.dp, 8.dp), text = msg, fontSize = 14.sp, color = Color.White
-            )
+            Text(modifier = Modifier.padding(24.dp, 8.dp), text = msg, fontSize = 14.sp, color = Color.White)
         }
     }
 }

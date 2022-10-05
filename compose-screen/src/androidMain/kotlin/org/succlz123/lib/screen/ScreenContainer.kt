@@ -1,28 +1,24 @@
 package org.succlz123.lib.screen
 
+import android.app.Activity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.OnBackPressedDispatcherOwner
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.geometry.Size
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.*
-import kotlinx.coroutines.flow.distinctUntilChanged
 import org.succlz123.lib.screen.back.ScreenOnBackPressedDispatcher
 import org.succlz123.lib.screen.back.ScreenOnBackPressedDispatcherOwner
 import org.succlz123.lib.screen.lifecycle.ScreenLifecycle
 import org.succlz123.lib.screen.lifecycle.ScreenLifecycleOwner
 import org.succlz123.lib.screen.lifecycle.rememberScreenLifecycleOwner
+import org.succlz123.lib.screen.viewmodel.AndroidSavableViewModel
+import org.succlz123.lib.screen.viewmodel.androidViewModel
 import org.succlz123.lib.screen.viewmodel.rememberScreenViewModelStoreOwner
 import org.succlz123.lib.screen.window.rememberScreenWindowSizeOwner
+import org.succlz123.lib.screen.window.rememberWindowSize
+import org.succlz123.lib.screen.window.rememberWindowSizeClass
 
 val LocalAndroidScreenViewModelStoreOwner = compositionLocalOf<ViewModelStoreOwner> {
     error("${ScreenLogger.TAG}: There is no android view model store owner in the local!")
@@ -30,32 +26,43 @@ val LocalAndroidScreenViewModelStoreOwner = compositionLocalOf<ViewModelStoreOwn
 
 @Composable
 fun ScreenContainer(
+    activity: AppCompatActivity,
+    content: @Composable () -> Unit,
+) {
+    ScreenContainer(activity, activity, activity, activity, content)
+}
+
+@Composable
+fun ScreenContainer(
+    activity: Activity,
     androidLifecycleOwner: LifecycleOwner,
     androidViewModelStoreOwner: ViewModelStoreOwner,
     androidOnBackPressedDispatcherOwner: OnBackPressedDispatcherOwner,
     content: @Composable () -> Unit,
 ) {
     val screenLifecycleOwner = rememberScreenLifecycleOwner()
-    bind2AndroidLifecycle(androidLifecycleOwner, screenLifecycleOwner)
-    val screenViewModelStoreOwner = rememberScreenViewModelStoreOwner()
+    Bind2AndroidLifecycle(androidLifecycleOwner, screenLifecycleOwner)
+
+    val savableViewModel = androidViewModelStoreOwner.androidViewModel<AndroidSavableViewModel>()
+    val screenViewModelStoreOwner = rememberScreenViewModelStoreOwner(savableViewModel)
+
     val screenOnBackPressedDispatcherOwner = rememberOnBackPressedDispatcherOwner(
-        androidLifecycleOwner, androidOnBackPressedDispatcherOwner.onBackPressedDispatcher
+        androidOnBackPressedDispatcherOwner.onBackPressedDispatcher
     )
     val screenWindowSizeOwner = rememberScreenWindowSizeOwner()
-
-    val density = LocalDensity.current
+    val windowSize = activity.rememberWindowSize()
+    val windowSizeClass = activity.rememberWindowSizeClass()
     val configuration = LocalConfiguration.current
-    LaunchedEffect(Unit) {
-        snapshotFlow { configuration }.distinctUntilChanged().collect {
-            screenWindowSizeOwner.getWindowHolder().size =
-                Size(it.screenWidthDp.dp.value * density.density, it.screenHeightDp.dp.value * density.density)
-        }
+    LaunchedEffect(configuration) {
+        screenWindowSizeOwner.getWindowHolder().size.value = windowSize
+        screenWindowSizeOwner.getWindowHolder().sizeClass.value = windowSizeClass
     }
 
     CompositionLocalProvider(
         LocalScreenScreenLifecycleOwner provides screenLifecycleOwner,
 
         LocalAndroidScreenViewModelStoreOwner provides androidViewModelStoreOwner,
+        LocalScreenSavableViewModel provides savableViewModel,
         LocalScreenViewModelStoreOwner provides screenViewModelStoreOwner,
 
         LocalScreenOnBackPressedDispatcherOwner provides screenOnBackPressedDispatcherOwner,
@@ -66,7 +73,7 @@ fun ScreenContainer(
 }
 
 @Composable
-public fun bind2AndroidLifecycle(
+fun Bind2AndroidLifecycle(
     androidLifecycleOwner: LifecycleOwner, screenLifecycleOwner: ScreenLifecycleOwner
 ) {
     DisposableEffect(Unit) {
@@ -106,9 +113,58 @@ public fun bind2AndroidLifecycle(
 }
 
 @Composable
-fun rememberOnBackPressedDispatcherOwner(
-    androidLifecycleOwner: LifecycleOwner, androidOnBackPressedDispatcher: OnBackPressedDispatcher
-): ScreenOnBackPressedDispatcherOwner {
+fun rememberOnBackPressedDispatcherOwner(androidOnBackPressedDispatcher: OnBackPressedDispatcher): ScreenOnBackPressedDispatcherOwner {
+    val composeLifecycle = remember {
+        object : Lifecycle() {
+            private val observerList = arrayListOf<LifecycleObserver>()
+
+            var state = State.INITIALIZED
+
+            override fun addObserver(observer: LifecycleObserver) {
+                observerList.add(observer)
+            }
+
+            override fun removeObserver(observer: LifecycleObserver) {
+                observerList.remove(observer)
+            }
+
+            override fun getCurrentState(): State {
+                return state
+            }
+
+            fun setCurrentState(source: LifecycleOwner, state: State) {
+                this.state = state
+                for (lifecycleObserver in observerList) {
+                    if (lifecycleObserver is LifecycleEventObserver) {
+                        when (state) {
+                            State.DESTROYED -> {
+                                lifecycleObserver.onStateChanged(source, Event.ON_DESTROY)
+                            }
+
+                            State.STARTED -> {
+                                lifecycleObserver.onStateChanged(source, Event.ON_START)
+                            }
+
+                            else -> {
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+    val composeLifecycleOwner = remember {
+        LifecycleOwner { composeLifecycle }
+    }
+
+    DisposableEffect(Unit) {
+        composeLifecycle.setCurrentState(composeLifecycleOwner, Lifecycle.State.STARTED)
+        onDispose {
+            composeLifecycle.setCurrentState(composeLifecycleOwner, Lifecycle.State.DESTROYED)
+        }
+    }
+
     return remember {
         object : ScreenOnBackPressedDispatcherOwner {
             private var callback: OnBackPressedCallback? = null
@@ -123,7 +179,7 @@ fun rememberOnBackPressedDispatcherOwner(
                         screenOnBackPressedDispatcher.onBackPressed()
                     }
                 }.apply {
-                    androidOnBackPressedDispatcher.addCallback(androidLifecycleOwner, this)
+                    androidOnBackPressedDispatcher.addCallback(composeLifecycleOwner, this)
                 }
             }
 

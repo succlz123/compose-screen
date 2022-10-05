@@ -9,17 +9,24 @@ import org.succlz123.lib.screen.back.ScreenOnBackPressedDispatcher
 import org.succlz123.lib.screen.core.ItemScreen
 import org.succlz123.lib.screen.ext.popupwindow.ScreenPopupWindowPopupScreen
 import org.succlz123.lib.screen.ext.popupwindow.ScreenPopupWindowSaveId
-import org.succlz123.lib.screen.ext.toast.*
+import org.succlz123.lib.screen.ext.toast.ARGS_TOAST_TIME_SHORT
+import org.succlz123.lib.screen.ext.toast.KEY_TOAST_TIME
+import org.succlz123.lib.screen.ext.toast.ScreenToastPopupScreen
+import org.succlz123.lib.screen.ext.toast.ScreenToastSaveId
 import org.succlz123.lib.screen.lifecycle.ScreenLifecycle
 import org.succlz123.lib.screen.lifecycle.ScreenLifecycleObserver
 import org.succlz123.lib.screen.operation.*
+import org.succlz123.lib.screen.transition.ScreenTransitionPopNone
+import org.succlz123.lib.screen.transition.ScreenTransitionPushNone
 import org.succlz123.lib.screen.viewmodel.ScreenViewModelStore
 
-class ScreenManager(
-    val screenCollector: ScreenCollector,
-    val hostLifecycle: ScreenLifecycle,
-    private val onBackPressedDispatcher: ScreenOnBackPressedDispatcher
-) : ScreenLifecycleObserver, ScreenViewModelStore() {
+class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
+    lateinit var screenCollector: ScreenCollector
+
+    lateinit var hostLifecycle: ScreenLifecycle
+
+    private lateinit var onBackPressedDispatcher: ScreenOnBackPressedDispatcher
+
     var recordSaveId = 0
 
     var recordSaveIdCoe = 10000
@@ -38,27 +45,23 @@ class ScreenManager(
         }
     }
 
-    fun initRecordStack(rootScreenName: String) {
-        if (recordStack.getRecordList().isNotEmpty()) {
-            return
-        }
-        initToastScreen()
-        initPopupWindowScreen()
-        push(rootScreenName, ScreenArgs(), null)
+    fun init(
+        screenCollector: ScreenCollector,
+        hostLifecycle: ScreenLifecycle,
+        onBackPressedDispatcher: ScreenOnBackPressedDispatcher
+    ) {
+        this.screenCollector = screenCollector
+        this.hostLifecycle = hostLifecycle
+        this.onBackPressedDispatcher = onBackPressedDispatcher
         onBackPressedDispatcher.setRootCallback(screenOnBackPressedCallback)
         updateBackPressedDispatcherEnable()
     }
 
-    private fun initToastScreen() {
-        screenCollector.addScreen(ItemScreen(name = ScreenToastPopupScreen) {
-            ScreenToastPopupScreen()
-        })
-    }
-
-    private fun initPopupWindowScreen() {
-        screenCollector.addScreen(ItemScreen(name = ScreenPopupWindowPopupScreen) {
-            ScreenPopupWindowPopupScreen()
-        })
+    fun initRecordStack(rootScreenName: String) {
+        if (recordStack.getRecordList().isNotEmpty()) {
+            return
+        }
+        push(rootScreenName, ScreenArgs(), null)
     }
 
     fun getStackHistory(): String {
@@ -86,7 +89,14 @@ class ScreenManager(
 
     fun toast(arguments: ScreenArgs, content: (@Composable (ScreenRecord) -> Unit)?) {
         val screen = if (content != null) {
-            ScreenAnonymityToastFragmentScreen(content = content)
+            ItemScreen(
+                "ScreenAnonymityToastPopupScreen",
+                false,
+                0,
+                ScreenTransitionPushNone(),
+                ScreenTransitionPopNone(),
+                content
+            )
         } else {
             screenCollector.screenList.find { it.name == ScreenToastPopupScreen }
         }
