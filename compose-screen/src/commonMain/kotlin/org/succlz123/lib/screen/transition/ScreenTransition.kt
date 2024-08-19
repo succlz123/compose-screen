@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalAnimationApi::class)
-
 package org.succlz123.lib.screen.transition
 
 import androidx.compose.animation.*
@@ -7,9 +5,9 @@ import androidx.compose.animation.core.tween
 import org.succlz123.lib.screen.ScreenLogger
 import org.succlz123.lib.screen.ScreenRecord
 
-typealias ScreenEnterTransitionProvider = (AnimatedContentScope<ScreenRecord>) -> EnterTransition
+typealias ScreenEnterTransitionProvider = (AnimatedContentTransitionScope<ScreenRecord>) -> EnterTransition
 
-typealias ScreenExitTransitionProvider = (AnimatedContentScope<ScreenRecord>) -> ExitTransition
+typealias ScreenExitTransitionProvider = (AnimatedContentTransitionScope<ScreenRecord>) -> ExitTransition
 
 open class ScreenPushTransition(
     // for this
@@ -86,7 +84,7 @@ object ScreenTransitionUtils {
         // initialState(退出) -> targetState(进入)
         return { contentScope ->
             contentScope.slideIntoContainer( // targetState(进入) - push enter - for this (target)
-                towards = AnimatedContentScope.SlideDirection.Left, animationSpec = tween(durationMillis = duration)
+                towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(durationMillis = duration)
             ) { initialOffset ->
                 initialOffset
             }
@@ -97,7 +95,7 @@ object ScreenTransitionUtils {
     fun right2LeftOutPushExitTransition(duration: Int = 350): ScreenExitTransitionProvider {
         return { contentScope ->
             contentScope.slideOutOfContainer( // initialState(退出) - push exit - for other (target)
-                towards = AnimatedContentScope.SlideDirection.Left, animationSpec = tween(durationMillis = duration)
+                towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(durationMillis = duration)
             ) { offsetForFullSlide ->
                 offsetForFullSlide / 5
             }
@@ -109,7 +107,7 @@ object ScreenTransitionUtils {
         // targetState(进入) <- initialState(退出)
         return { contentScope ->
             contentScope.slideIntoContainer( // targetState(进入) - pop enter - for other (target)
-                towards = AnimatedContentScope.SlideDirection.Right, animationSpec = tween(durationMillis = duration)
+                towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(durationMillis = duration)
             ) { initialOffset ->
                 initialOffset / 5
             }
@@ -120,7 +118,7 @@ object ScreenTransitionUtils {
     fun left2RightPopExitTransition(duration: Int = 350): ScreenExitTransitionProvider {
         return { contentScope ->
             contentScope.slideOutOfContainer( // initialState(退出) - pop exit - for this (target)
-                towards = AnimatedContentScope.SlideDirection.Right, animationSpec = tween(durationMillis = duration)
+                towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(durationMillis = duration)
             ) { offsetForFullSlide ->
                 offsetForFullSlide
             }
