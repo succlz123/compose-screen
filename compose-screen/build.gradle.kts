@@ -28,7 +28,7 @@ kotlin {
         }
     }
 
-    android {
+    androidTarget {
         publishLibraryVariants("release")
     }
 
@@ -43,7 +43,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
             }
         }
         val iosMain by creating {
@@ -64,7 +64,7 @@ kotlin {
                 api("androidx.core:core-ktx:1.13.1")
                 api("androidx.window:window:1.3.0")
 
-                implementation("androidx.compose.foundation:foundation:1.6.8")
+                implementation("androidx.compose.foundation:foundation:1.7.8")
             }
         }
         val desktopMain by getting {
@@ -82,8 +82,11 @@ android {
         minSdk = 21
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+    kotlin {
+        jvmToolchain(21)
     }
 }
 

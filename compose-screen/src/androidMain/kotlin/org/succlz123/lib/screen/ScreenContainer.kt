@@ -120,16 +120,15 @@ fun rememberOnBackPressedDispatcherOwner(androidOnBackPressedDispatcher: OnBackP
 
             var state = State.INITIALIZED
 
+            override val currentState: State
+                get() = state
+
             override fun addObserver(observer: LifecycleObserver) {
                 observerList.add(observer)
             }
 
             override fun removeObserver(observer: LifecycleObserver) {
                 observerList.remove(observer)
-            }
-
-            override fun getCurrentState(): State {
-                return state
             }
 
             fun setCurrentState(source: LifecycleOwner, state: State) {
@@ -148,14 +147,16 @@ fun rememberOnBackPressedDispatcherOwner(androidOnBackPressedDispatcher: OnBackP
                             else -> {
                             }
                         }
-
                     }
                 }
             }
         }
     }
     val composeLifecycleOwner = remember {
-        LifecycleOwner { composeLifecycle }
+        object : LifecycleOwner {
+            override val lifecycle: Lifecycle
+                get() = composeLifecycle
+        }
     }
 
     DisposableEffect(Unit) {
