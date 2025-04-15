@@ -19,7 +19,7 @@ dependencies {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 35
     defaultConfig {
         applicationId = "org.succlz123.lib.android"
         minSdk = 21
