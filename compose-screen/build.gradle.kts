@@ -42,7 +42,7 @@ kotlin {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
-                api(compose.material)
+                api(compose.material3)
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
             }
         }
