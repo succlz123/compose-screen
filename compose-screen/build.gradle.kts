@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.*
 
 plugins {
@@ -13,12 +15,16 @@ group = "io.github.succlz123"
 version = "0.0.2"
 
 kotlin {
-    androidTarget()
+    androidTarget{
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+    }
 
     jvm("desktop")
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -32,6 +38,15 @@ kotlin {
         publishLibraryVariants("release")
     }
 
+    ohosArm64 {
+        binaries.sharedLib {
+            baseName = "kn"
+            export(libs.compose.multiplatform.export)
+        }
+
+        val main by compilations.getting
+    }
+
     sourceSets {
         all {
             languageSettings {
@@ -42,15 +57,14 @@ kotlin {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
-                api(compose.material3)
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+                api(compose.material)
+
+                api(libs.kotlinx.coroutines.core)
+                api(libs.atomicFu)
             }
         }
         val iosMain by creating {
             dependsOn(commonMain)
-        }
-        val iosX64Main by getting {
-            dependsOn(iosMain)
         }
         val iosArm64Main by getting {
             dependsOn(iosMain)
@@ -71,6 +85,13 @@ kotlin {
             dependencies {
             }
         }
+
+        val ohosArm64Main by getting {
+            dependsOn(commonMain)
+            dependencies {
+                api(libs.compose.multiplatform.export)
+            }
+        }
     }
 }
 
@@ -82,11 +103,8 @@ android {
         minSdk = 21
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-    }
-    kotlin {
-        jvmToolchain(21)
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 

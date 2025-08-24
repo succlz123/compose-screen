@@ -4,10 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -54,8 +53,8 @@ fun ScreenToastPopupScreen() {
         Card(
             modifier = Modifier.align(location).padding(64.dp, 92.dp),
             shape = MaterialTheme.shapes.medium,
-            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF000000))
+            elevation = 3.dp,
+            backgroundColor = Color(0xFF000000)
         ) {
             Box(modifier = Modifier.padding(24.dp, 8.dp)) {
                 Text(text = msg, fontSize = 14.sp, color = Color.White)

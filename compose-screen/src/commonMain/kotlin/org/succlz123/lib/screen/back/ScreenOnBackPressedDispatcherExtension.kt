@@ -9,8 +9,11 @@ fun rememberOnBackPressedDispatcherOwner(): ScreenOnBackPressedDispatcherOwner {
         object : ScreenOnBackPressedDispatcherOwner {
             private val screenOnBackPressedDispatcher = ScreenOnBackPressedDispatcher {}
 
-            override fun getOnBackPressedDispatcher(): ScreenOnBackPressedDispatcher {
+            override fun get(): ScreenOnBackPressedDispatcher {
                 return screenOnBackPressedDispatcher
+            }
+
+            override fun sendBackPressedToSystem() {
             }
         }
     }

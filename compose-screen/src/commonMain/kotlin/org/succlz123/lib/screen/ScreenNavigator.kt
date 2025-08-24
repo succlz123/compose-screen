@@ -41,9 +41,7 @@ class ScreenNavigator {
         screenManager?.pushDeeplink(deeplink, arguments, pushOptions)
     }
 
-    fun toast(
-        msg: String, time: Long = ARGS_TOAST_TIME_SHORT, content: (@Composable (ScreenRecord) -> Unit)? = null
-    ) {
+    fun toast(msg: String, time: Long = ARGS_TOAST_TIME_SHORT, content: (@Composable (ScreenRecord) -> Unit)? = null) {
         screenManager?.toast(ScreenArgs.putValue(KEY_TOAST_MSG, msg).putValue(KEY_TOAST_TIME, time), content)
     }
 
@@ -90,6 +88,10 @@ class ScreenNavigator {
 
     fun popAllPopupScreen() {
         screenManager?.popAllPopupScreen()
+    }
+
+    fun exitScreen() {
+        screenManager?.exitScreen()
     }
 
     fun getStackHistory(): String {

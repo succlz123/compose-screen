@@ -4,10 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.succlz123.lib.screen.core.GroupScreen
+import org.succlz123.lib.screen.core.ItemScreen
 import org.succlz123.lib.screen.core.Screen
 import org.succlz123.lib.screen.lifecycle.ScreenLifecycle
 import org.succlz123.lib.screen.operation.PushOptions
 import org.succlz123.lib.screen.operation.ScreenStackState
+import org.succlz123.lib.screen.transition.ScreenPopTransition
+import org.succlz123.lib.screen.transition.ScreenPushTransition
+import org.succlz123.lib.screen.transition.ScreenTransitionPopNone
+import org.succlz123.lib.screen.transition.ScreenTransitionPushNone
 import org.succlz123.lib.screen.viewmodel.ScreenViewModelStore
 
 fun ScreenRecord?.isTargetRecord(screenName: String, screenKey: String?): Boolean {
@@ -77,6 +83,46 @@ class ScreenRecord(
 
     internal fun removePopupRecord(screenRecord: ScreenRecord) {
         popupScreenList.remove(screenRecord)
+    }
+
+    internal fun pushT(): ScreenPushTransition {
+        return if (pushOptions.pushTransition is ScreenTransitionPushNone) {
+            when (screen) {
+                is GroupScreen -> {
+                    screen.pushTransition
+                }
+
+                is ItemScreen -> {
+                    screen.pushTransition
+                }
+
+                else -> {
+                    pushOptions.pushTransition
+                }
+            }
+        } else {
+            pushOptions.pushTransition
+        }
+    }
+
+    internal fun popT(): ScreenPopTransition {
+        return if (pushOptions.popTransition is ScreenTransitionPopNone) {
+            when (screen) {
+                is GroupScreen -> {
+                    screen.popTransition
+                }
+
+                is ItemScreen -> {
+                    screen.popTransition
+                }
+
+                else -> {
+                    pushOptions.popTransition
+                }
+            }
+        } else {
+            pushOptions.popTransition
+        }
     }
 
     override fun toString(): String {

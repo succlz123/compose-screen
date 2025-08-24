@@ -5,9 +5,19 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.lifecycle.*
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelStoreOwner
 import org.succlz123.lib.screen.back.ScreenOnBackPressedDispatcher
 import org.succlz123.lib.screen.back.ScreenOnBackPressedDispatcherOwner
 import org.succlz123.lib.screen.lifecycle.ScreenLifecycle
@@ -53,6 +63,7 @@ fun ScreenContainer(
     val windowSize = activity.rememberWindowSize()
     val windowSizeClass = activity.rememberWindowSizeClass()
     val configuration = LocalConfiguration.current
+
     LaunchedEffect(configuration) {
         screenWindowSizeOwner.getWindowHolder().size.value = windowSize
         screenWindowSizeOwner.getWindowHolder().sizeClass.value = windowSizeClass
@@ -184,8 +195,12 @@ fun rememberOnBackPressedDispatcherOwner(androidOnBackPressedDispatcher: OnBackP
                 }
             }
 
-            override fun getOnBackPressedDispatcher(): ScreenOnBackPressedDispatcher {
+            override fun get(): ScreenOnBackPressedDispatcher {
                 return screenOnBackPressedDispatcher
+            }
+
+            override fun sendBackPressedToSystem() {
+                androidOnBackPressedDispatcher.onBackPressed()
             }
         }
     }

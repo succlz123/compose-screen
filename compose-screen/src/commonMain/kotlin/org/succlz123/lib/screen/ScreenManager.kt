@@ -6,6 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.succlz123.lib.screen.back.ScreenOnBackPressedDispatcher
+import org.succlz123.lib.screen.back.ScreenOnBackPressedDispatcherOwner
 import org.succlz123.lib.screen.core.ItemScreen
 import org.succlz123.lib.screen.ext.popupwindow.ScreenPopupWindowPopupScreen
 import org.succlz123.lib.screen.ext.popupwindow.ScreenPopupWindowSaveId
@@ -25,7 +26,7 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
 
     lateinit var hostLifecycle: ScreenLifecycle
 
-    private lateinit var onBackPressedDispatcher: ScreenOnBackPressedDispatcher
+    private lateinit var onBackPressedDispatcherOwner: ScreenOnBackPressedDispatcherOwner
 
     var recordSaveId = 0
 
@@ -48,12 +49,12 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
     fun init(
         screenCollector: ScreenCollector,
         hostLifecycle: ScreenLifecycle,
-        onBackPressedDispatcher: ScreenOnBackPressedDispatcher
+        onBackPressedDispatcherOwer: ScreenOnBackPressedDispatcherOwner
     ) {
         this.screenCollector = screenCollector
         this.hostLifecycle = hostLifecycle
-        this.onBackPressedDispatcher = onBackPressedDispatcher
-        onBackPressedDispatcher.setRootCallback(screenOnBackPressedCallback)
+        this.onBackPressedDispatcherOwner = onBackPressedDispatcherOwer
+        onBackPressedDispatcherOwer.get().setRootCallback(screenOnBackPressedCallback)
         updateBackPressedDispatcherEnable()
     }
 
@@ -69,7 +70,12 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
     }
 
     private fun updateBackPressedDispatcherEnable() {
-        onBackPressedDispatcher.setEnable(recordStack.canPop())
+        onBackPressedDispatcherOwner.get().setEnable(recordStack.canPop())
+    }
+
+    fun exitScreen() {
+        onBackPressedDispatcherOwner.get().setEnable(false)
+        onBackPressedDispatcherOwner.sendBackPressedToSystem()
     }
 
     fun push(screenName: String, arguments: ScreenArgs, pushOptions: PushOptions?) {

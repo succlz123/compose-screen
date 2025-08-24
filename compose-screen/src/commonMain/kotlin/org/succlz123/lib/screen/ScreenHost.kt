@@ -60,7 +60,7 @@ fun ScreenHost(
         val lifecycleOwner = LocalScreenScreenLifecycleOwner.current
         val savableViewModel = LocalScreenSavableViewModel.current
         val viewModelStoreOwner = LocalScreenViewModelStoreOwner.current
-        val onBackPressedDispatcher = LocalScreenOnBackPressedDispatcherOwner.current
+        val onBackPressedDispatcherOwner = LocalScreenOnBackPressedDispatcherOwner.current
 
         val saveableStateHolder = rememberSaveableStateHolder()
 
@@ -74,9 +74,7 @@ fun ScreenHost(
         val manager = remember {
             val sm = savableViewModel.getScreenManager() ?: ScreenManager()
             sm.apply {
-                this.init(
-                    screenCollector, lifecycleOwner.getLifecycle(), onBackPressedDispatcher.getOnBackPressedDispatcher()
-                )
+                this.init(screenCollector, lifecycleOwner.getLifecycle(), onBackPressedDispatcherOwner)
                 screenNavigator.init(this)
                 savableViewModel.bind(this)
             }
@@ -109,7 +107,7 @@ fun ScreenHost(
             val isTheSameScreenName = targetState.screen == initialState.screen
             if (isSingleTopOrSingleTask && isTheSameScreenName) {
                 return@AnimatedContent (EnterTransition.None with ExitTransition.None).apply {
-                    targetContentZIndex = targetState.pushOptions.pushTransition.contentZIndex(
+                    targetContentZIndex = targetState.pushT().contentZIndex(
                         blackStackList, isPush, initialState, targetState
                     )
                 }
@@ -117,18 +115,18 @@ fun ScreenHost(
             ScreenLogger.debugLog("screen animation: targetState - $targetState")
             ScreenLogger.debugLog("screen animation: initialState - $initialState")
             if (isPush) {
-                val pushEnterTransition = targetState.pushOptions.pushTransition.enterTransition(this)
-                val pushExitTransition = targetState.pushOptions.pushTransition.exitTransition(this)
+                val pushEnterTransition = targetState.pushT().enterTransition(this)
+                val pushExitTransition = targetState.pushT().exitTransition(this)
                 (pushEnterTransition with pushExitTransition).apply {
-                    targetContentZIndex = targetState.pushOptions.pushTransition.contentZIndex(
+                    targetContentZIndex = targetState.pushT().contentZIndex(
                         blackStackList, true, initialState, targetState
                     )
                 }
             } else {
-                val popEnterTransition = initialState.pushOptions.popTransition.enterTransition(this)
-                val popExitTransition = initialState.pushOptions.popTransition.exitTransition(this)
+                val popEnterTransition = initialState.popT().enterTransition(this)
+                val popExitTransition = initialState.popT().exitTransition(this)
                 (popEnterTransition with popExitTransition).apply {
-                    targetContentZIndex = targetState.pushOptions.popTransition.contentZIndex(
+                    targetContentZIndex = targetState.popT().contentZIndex(
                         blackStackList, false, initialState, targetState
                     )
                 }

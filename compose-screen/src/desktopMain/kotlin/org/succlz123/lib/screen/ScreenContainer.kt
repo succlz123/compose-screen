@@ -90,7 +90,7 @@ fun ScreenContainer(
             alwaysOnTop = alwaysOnTop,
             onPreviewKeyEvent = {
                 if (enableEscBack && it.key == Key.Escape && it.type == KeyEventType.KeyDown) {
-                    screenOnBackPressedDispatcherOwner.getOnBackPressedDispatcher().onBackPressed()
+                    screenOnBackPressedDispatcherOwner.get().onBackPressed()
                 }
                 onPreviewKeyEvent(it)
             },

@@ -3,6 +3,8 @@ version = "0.0.2"
 
 allprojects {
     repositories {
+        maven("https://mirrors.tencent.com/nexus/repository/maven-tencent")
+        maven("https://mirrors.tencent.com/nexus/repository/maven-public")
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
