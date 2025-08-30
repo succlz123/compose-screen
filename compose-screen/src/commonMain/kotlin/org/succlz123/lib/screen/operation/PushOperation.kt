@@ -10,7 +10,7 @@ import org.succlz123.lib.screen.core.Screen
 
 object PushOperation {
 
-    fun pushDeeplink(manager: ScreenManager, deeplink: String, arguments: ScreenArgs, pushOptions: PushOptions?) {
+    fun pushDeeplink(manager: ScreenManager, deeplink: String, arguments: ScreenArgs, pushOptions: PushOptions?, onResult: (result: Any?) -> Unit) {
         val deeplinkHostAndPath = deeplink.split("?").firstOrNull()
         if (deeplinkHostAndPath.isNullOrEmpty()) {
             return
@@ -33,10 +33,10 @@ object PushOperation {
             ScreenLogger.debugLog("Push Operation: Can't find the deeplink destination - $deeplink")
             return
         }
-        push(manager, findScreen, arguments, pushOptions)
+        push(manager, findScreen, arguments, pushOptions, onResult)
     }
 
-    fun push(manager: ScreenManager, screen: Screen, arguments: ScreenArgs, pushOptions: PushOptions?) {
+    fun push(manager: ScreenManager, screen: Screen, arguments: ScreenArgs, pushOptions: PushOptions?, onResult: (result: Any?) -> Unit) {
         val removePredicate = pushOptions?.removePredicate
         var isTaskRootReplaced = false
 //        val destroyList = ArrayList<ScreenRecord>()
@@ -82,7 +82,7 @@ object PushOperation {
             is GroupScreen -> {
                 val curSaveId = (manager.recordSaveId++) * manager.recordSaveIdCoe
                 val record =
-                    ScreenRecord.newInstance(screen, curSaveId, manager.hostLifecycle, arguments, pushOptions)
+                    ScreenRecord.newInstance(screen, curSaveId, manager.hostLifecycle, arguments, pushOptions, onResult)
                 ScreenStackState.moveState(record, ScreenStackState.IN_STACK)
                 manager.recordStack.push(record)
             }
@@ -104,7 +104,7 @@ object PushOperation {
                     }
                 }
                 val record =
-                    ScreenRecord.newInstance(screen, curPopupSaveId, manager.hostLifecycle, arguments, pushOptions)
+                    ScreenRecord.newInstance(screen, curPopupSaveId, manager.hostLifecycle, arguments, pushOptions, onResult)
                 ScreenStackState.moveState(record, ScreenStackState.IN_STACK)
                 currentGroupRecord.popupScreenList.add(record)
             }

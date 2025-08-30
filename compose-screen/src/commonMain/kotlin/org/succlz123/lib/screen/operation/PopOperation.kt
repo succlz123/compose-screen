@@ -94,29 +94,44 @@ object PopOperation {
             return
         }
 
-        returnRecord.result = result
-
         for (removeRecord in destroyRecordList) {
             ScreenStackState.moveState(removeRecord, ScreenStackState.OUT_STACK)
             backStackList.remove(removeRecord)
         }
         ScreenStackState.moveState(returnRecord, ScreenStackState.IN_STACK)
+
+        val popupWindowRecord = returnRecord.getPopupWindowRecord()
+        if (popupWindowRecord != null) {
+            popupWindowRecord.onResult(result)
+        }
+        returnRecord.onResult(result)
     }
 
-    fun popAllPopupScreen(backStackList: ScreenRecordStack) {
+    fun popAllPopupScreen(backStackList: ScreenRecordStack, result: Any?) {
         val currentRecord = backStackList.getCurrentGroupRecord() ?: return
         for (curPopupRecord in currentRecord.popupScreenList) {
             ScreenStackState.moveState(curPopupRecord, ScreenStackState.OUT_STACK)
         }
         currentRecord.popupScreenList.clear()
+
+        val popupWindowRecord = currentRecord.getPopupWindowRecord()
+        if (popupWindowRecord != null) {
+            popupWindowRecord.onResult(result)
+        }
+        currentRecord.onResult(result)
     }
 
-    fun popCurPopupScreen(backStackList: ScreenRecordStack) {
+    fun popCurPopupScreen(backStackList: ScreenRecordStack, result: Any?) {
         val currentRecord = backStackList.getCurrentGroupRecord() ?: return
         val curPopupRecord = currentRecord.getCurrentPopupRecord()
         if (curPopupRecord != null) {
             ScreenStackState.moveState(curPopupRecord, ScreenStackState.OUT_STACK)
             currentRecord.removePopupRecord(curPopupRecord)
+            val popupWindowRecord = currentRecord.getPopupWindowRecord()
+            if (popupWindowRecord != null) {
+                popupWindowRecord.onResult(result)
+            }
+            curPopupRecord.onResult(result)
         }
     }
 }

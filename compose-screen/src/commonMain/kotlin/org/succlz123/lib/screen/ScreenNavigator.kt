@@ -24,21 +24,23 @@ class ScreenNavigator {
         screenName: String,
         screenKey: String? = null,
         arguments: ScreenArgs = ScreenArgs(),
-        pushOptions: PushOptions? = null
+        pushOptions: PushOptions? = null,
+        onResult: (result: Any?) -> Unit = {}
     ) {
         arguments.putScreenKey(screenKey)
-        screenManager?.push(screenName, arguments, pushOptions)
+        screenManager?.push(screenName, arguments, pushOptions, onResult)
     }
 
     fun pushDeeplink(
         deeplink: String,
         screenKey: String? = null,
         arguments: ScreenArgs = ScreenArgs(),
-        pushOptions: PushOptions? = null
+        pushOptions: PushOptions? = null,
+        onResult: (result: Any?) -> Unit = {}
     ) {
         arguments.putDeeplink(deeplink)
         arguments.putScreenKey(screenKey)
-        screenManager?.pushDeeplink(deeplink, arguments, pushOptions)
+        screenManager?.pushDeeplink(deeplink, arguments, pushOptions, onResult)
     }
 
     fun toast(msg: String, time: Long = ARGS_TOAST_TIME_SHORT, content: (@Composable (ScreenRecord) -> Unit)? = null) {
@@ -82,12 +84,12 @@ class ScreenNavigator {
         screenManager?.popToRoot(result)
     }
 
-    fun popPopupScreen() {
-        screenManager?.popPopupScreen()
+    fun popPopupScreen(result: Any?=null) {
+        screenManager?.popPopupScreen(result)
     }
 
-    fun popAllPopupScreen() {
-        screenManager?.popAllPopupScreen()
+    fun popAllPopupScreen(result: Any?=null) {
+        screenManager?.popAllPopupScreen(result)
     }
 
     fun exitScreen() {

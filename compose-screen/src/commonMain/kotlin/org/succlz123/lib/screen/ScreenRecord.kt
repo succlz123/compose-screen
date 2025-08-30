@@ -27,13 +27,13 @@ fun ScreenRecord?.isTargetRecord(screenName: String, screenKey: String?): Boolea
     }
 }
 
-
 class ScreenRecord(
     val screen: Screen,
     val saveId: Int,
     val hostLifecycle: ScreenLifecycle,
     val arguments: ScreenArgs,
-    val pushOptions: PushOptions
+    val pushOptions: PushOptions,
+    val onResult: (result: Any?) -> Unit
 ) : ScreenViewModelStore() {
 
     companion object {
@@ -43,9 +43,10 @@ class ScreenRecord(
             saveId: Int,
             screenLifecycle: ScreenLifecycle,
             arguments: ScreenArgs,
-            pushOptions: PushOptions?
+            pushOptions: PushOptions?,
+            onResult: (result: Any?) -> Unit
         ): ScreenRecord {
-            return ScreenRecord(screen, saveId, screenLifecycle, arguments, pushOptions ?: (PushOptions()))
+            return ScreenRecord(screen, saveId, screenLifecycle, arguments, pushOptions ?: (PushOptions()), onResult)
         }
     }
 
@@ -53,10 +54,11 @@ class ScreenRecord(
 
     internal val popupWindowRecord = mutableStateOf<ScreenRecord?>(null)
 
-    val stackStateFlow = MutableStateFlow(ScreenStackState.UNKNOWN)
+    fun getPopupWindowRecord(): ScreenRecord? {
+        return popupWindowRecord.value
+    }
 
-    var result: Any? = null
-        internal set
+    val stackStateFlow = MutableStateFlow(ScreenStackState.UNKNOWN)
 
     var removeFlag: Boolean = false
         internal set

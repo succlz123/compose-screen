@@ -62,7 +62,7 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
         if (recordStack.getRecordList().isNotEmpty()) {
             return
         }
-        push(rootScreenName, ScreenArgs(), null)
+        push(rootScreenName, ScreenArgs(), null, {})
     }
 
     fun getStackHistory(): String {
@@ -78,18 +78,18 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
         onBackPressedDispatcherOwner.sendBackPressedToSystem()
     }
 
-    fun push(screenName: String, arguments: ScreenArgs, pushOptions: PushOptions?) {
+    fun push(screenName: String, arguments: ScreenArgs, pushOptions: PushOptions?, onResult: (result: Any?) -> Unit) {
         val find = screenCollector.screenList.find { it.name == screenName }
         if (find == null) {
             ScreenLogger.debugLog("Push Operation: Can't find the target screen - $screenName")
             return
         }
-        PushOperation.push(this, find, arguments, pushOptions)
+        PushOperation.push(this, find, arguments, pushOptions, onResult)
         updateBackPressedDispatcherEnable()
     }
 
-    fun pushDeeplink(deeplink: String, arguments: ScreenArgs, pushOptions: PushOptions?) {
-        PushOperation.pushDeeplink(this, deeplink, arguments, pushOptions)
+    fun pushDeeplink(deeplink: String, arguments: ScreenArgs, pushOptions: PushOptions?, onResult: (result: Any?) -> Unit) {
+        PushOperation.pushDeeplink(this, deeplink, arguments, pushOptions, onResult)
         updateBackPressedDispatcherEnable()
     }
 
@@ -110,7 +110,7 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
             return
         }
         recordStack.toastRecord.value = ScreenRecord.newInstance(
-            screen, ScreenToastSaveId, hostLifecycle, arguments, null
+            screen, ScreenToastSaveId, hostLifecycle, arguments, null, {}
         )
         val time = arguments.value(KEY_TOAST_TIME, ARGS_TOAST_TIME_SHORT)
         toastJob?.cancel()
@@ -131,7 +131,7 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
             return
         }
         currentGroupRecord.popupWindowRecord.value = ScreenRecord.newInstance(
-            screen, ScreenPopupWindowSaveId, hostLifecycle, arguments, null
+            screen, ScreenPopupWindowSaveId, hostLifecycle, arguments, null, {}
         ).apply {
             innerContent = content
         }
@@ -146,9 +146,7 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
         updateBackPressedDispatcherEnable()
     }
 
-    fun pop(
-        result: Any?, finishCurGroupScreen: Boolean, finishAllPopupScreen: Boolean, popOptions: PopOptions?
-    ) {
+    fun pop(result: Any?, finishCurGroupScreen: Boolean, finishAllPopupScreen: Boolean, popOptions: PopOptions?) {
         if (!recordStack.canPop()) {
             return
         }
@@ -172,9 +170,9 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
                 }
             } else {
                 if (finishAllPopupScreen) {
-                    PopOperation.popAllPopupScreen(recordStack)
+                    PopOperation.popAllPopupScreen(recordStack, result)
                 } else {
-                    PopOperation.popCurPopupScreen(recordStack)
+                    PopOperation.popCurPopupScreen(recordStack, result)
                 }
             }
         }
@@ -197,13 +195,13 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
         updateBackPressedDispatcherEnable()
     }
 
-    fun popAllPopupScreen() {
-        PopOperation.popAllPopupScreen(recordStack)
+    fun popAllPopupScreen(result: Any?) {
+        PopOperation.popAllPopupScreen(recordStack, result)
         updateBackPressedDispatcherEnable()
     }
 
-    fun popPopupScreen() {
-        PopOperation.popCurPopupScreen(recordStack)
+    fun popPopupScreen(result: Any?) {
+        PopOperation.popCurPopupScreen(recordStack, result)
         updateBackPressedDispatcherEnable()
     }
 
