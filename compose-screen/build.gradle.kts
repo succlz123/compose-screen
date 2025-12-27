@@ -43,7 +43,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material3)
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
             }
         }
         val iosMain by creating {

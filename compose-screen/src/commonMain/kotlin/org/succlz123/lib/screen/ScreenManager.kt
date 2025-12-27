@@ -156,10 +156,10 @@ class ScreenManager : ScreenLifecycleObserver, ScreenViewModelStore() {
             val currentGroupRecord = recordStack.getCurrentGroupRecord()
             val currentPopupRecordList = currentGroupRecord?.popupScreenList
             val currentToastPopupWindowRecord = currentGroupRecord?.popupWindowRecord
-            if (currentPopupRecordList.isNullOrEmpty()) {
-                if (currentToastPopupWindowRecord?.value != null) {
-                    currentToastPopupWindowRecord.value = null
-                } else if (popOptions?.popPredicate != null) {
+            if (currentToastPopupWindowRecord?.value != null) {
+                currentToastPopupWindowRecord.value = null
+            } else if (currentPopupRecordList.isNullOrEmpty()) {
+                if (popOptions?.popPredicate != null) {
                     PopOperation.popPredicateGroupScreen(recordStack, result, popOptions)
                 } else {
                     PopOperation.popGroupScreen(recordStack, result, popOptions)

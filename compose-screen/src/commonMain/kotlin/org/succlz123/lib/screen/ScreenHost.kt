@@ -135,11 +135,11 @@ fun ScreenHost(
             }
         }) { animatedRecord ->
             Screen(saveableStateHolder, lifecycleOwner, viewModelStoreOwner, animatedRecord)
-            animatedRecord.popupWindowRecord.value?.let { popupWindow ->
-                Screen(saveableStateHolder, lifecycleOwner, viewModelStoreOwner, popupWindow)
-            }
             for (popupRecord in animatedRecord.popupScreenList) {
                 Screen(saveableStateHolder, lifecycleOwner, viewModelStoreOwner, popupRecord)
+            }
+            animatedRecord.popupWindowRecord.value?.let { popupWindow ->
+                Screen(saveableStateHolder, lifecycleOwner, viewModelStoreOwner, popupWindow)
             }
             manager.recordStack.toastRecord.value?.let { toast ->
                 Screen(saveableStateHolder, lifecycleOwner, viewModelStoreOwner, toast)

@@ -53,7 +53,7 @@ fun ScreenToastPopupScreen() {
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         Card(
             modifier = Modifier.align(location).padding(64.dp, 92.dp),
-            shape = MaterialTheme.shapes.medium,
+            shape = MaterialTheme.shapes.large,
             elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF000000))
         ) {
