@@ -1,16 +1,19 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    id("org.jetbrains.compose")
-    id("com.android.application")
-    kotlin("android")
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+    }
 }
 
 group = "io.github.succlz123"
 version = "0.0.2"
-
-repositories {
-    mavenCentral()
-    google()
-}
 
 dependencies {
     implementation(project(":compose-screen"))
@@ -20,19 +23,17 @@ dependencies {
 
 android {
     compileSdk = 35
+    namespace = "org.succlz123.lib"
     defaultConfig {
         applicationId = "org.succlz123.lib.android"
         minSdk = 21
-        targetSdk = 30
+        targetSdk = 34
         versionCode = 1
-        versionName = "1.0-SNAPSHOT"
+        versionName = "1.0"
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildTypes {
         getByName("release") {

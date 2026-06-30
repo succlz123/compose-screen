@@ -1,19 +1,36 @@
+@file:Suppress("UnstableApiUsage")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
-        google()
         gradlePluginPortal()
-        mavenCentral()
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-
-    plugins {
-        kotlin("multiplatform").version(extra["kotlin.version"] as String)
-        kotlin("android").version(extra["kotlin.version"] as String)
-        id("com.android.application").version(extra["agp.version"] as String)
-        id("com.android.library").version(extra["agp.version"] as String)
-        id("org.jetbrains.compose").version(extra["compose.version"] as String)
+        maven("https://maven.aliyun.com/repository/public")
+        google()
     }
 }
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+    }
+
+    versionCatalogs {
+        create("libs") {
+            version("kotlin", extra["kotlin.version"].toString())
+            version("compose", extra["compose.version"].toString())
+            version("agp", extra["agp.version"].toString())
+        }
+    }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version("1.0.0")
+}
+
 
 rootProject.name = "compose-screen"
 
